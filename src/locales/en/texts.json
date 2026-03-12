@@ -29,10 +29,26 @@
     "showThumbnail": "Show thumbnail",
     "shown": "shown"
   },
+  "tokenPrompt": {
+    "title": "Access Required",
+    "intro": "To view Montandon data, you need to enter your IFRC GO token:",
+    "step1": {
+      "title": "Get your token",
+      "a": {
+        "prefix": "Visit the Account page on GO:",
+        "link": "https://go.ifrc.org/account/details",
+        "suffix": "(you must be logged in)."
+      },
+      "b": "Generate a new token in the Montandon section.",
+      "c": "Copy and save the generated token, as you will not be able to view it again."
+    },
+    "step2": "Click 'Enter your token' button and enter your token when prompted.",
+    "tokenPromptButton": "Enter your token"
+  },
   "authentication": {
     "button": {
-      "login": "Log in",
-      "logout": "Log out",
+      "login": "Enter your token",
+      "logout": "Remove token",
       "title": "Provide or update your credentials"
     },
     "chooseMethod": "Choose authentication method",

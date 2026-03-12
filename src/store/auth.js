@@ -79,7 +79,7 @@ export default function getStore(router) {
             cx.commit('resetActions');
           }
         };
-        
+
         const storage = new BrowserStorage(true);
         storage.set('authConfig', config);
 

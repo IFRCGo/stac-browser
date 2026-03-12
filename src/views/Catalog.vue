@@ -3,12 +3,15 @@
     <b-row>
       <b-col class="meta">
         <section class="intro">
-          <h2>{{ $t('description') }}</h2>
-          <DeprecationNotice v-if="showDeprecation" :data="data" />
-          <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
-          <ReadMore v-if="data.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
+          <TokenPrompt v-if="!isLoggedIn" @login="$store.dispatch('auth/requestLogin')" />
+          <template v-if="isLoggedIn">
+            <h2>{{ $t('description') }}</h2>
+            <DeprecationNotice v-if="showDeprecation" :data="data" />
+            <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
+            <ReadMore v-if="data.description" :key="isLoggedIn" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
             <Description :description="data.description" />
-          </ReadMore>
+            </ReadMore>
+          </template>
           <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" class="mb-3" />
           <CollectionLink v-if="collectionLink" :link="collectionLink" />
           <section v-if="isCollection" class="metadata mb-4">
@@ -61,18 +64,21 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import { defineAsyncComponent } from 'vue';
 import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
+import TokenPrompt from '../components/TokenPrompt.vue';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
+
 
 export default {
   name: "Catalog",
@@ -92,7 +98,8 @@ export default {
     Metadata: () => import('../components/Metadata.vue'),
     Providers: () => import('../components/Providers.vue'),
     ReadMore,
-    Thumbnails: () => import('../components/Thumbnails.vue')
+    TokenPrompt,
+    Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue'))
   },
   mixins: [
     ShowAssetLinkMixin,
@@ -141,6 +148,7 @@ export default {
   computed: {
     ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapGetters('auth', ['isLoggedIn']),
     cssStacType() {
       if (Utils.hasText(this.data?.type)) {
         return this.data?.type.toLowerCase();
