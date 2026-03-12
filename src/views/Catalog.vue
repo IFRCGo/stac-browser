@@ -3,12 +3,15 @@
     <b-row>
       <b-col class="meta">
         <section class="intro">
-          <h2>{{ $t('description') }}</h2>
-          <DeprecationNotice v-if="showDeprecation" :data="data" />
-          <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
-          <ReadMore v-if="data.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
+          <TokenPrompt v-if="!isLoggedIn" @login="$store.dispatch('auth/requestLogin')" />
+          <template v-if="isLoggedIn">
+            <h2>{{ $t('description') }}</h2>
+            <DeprecationNotice v-if="showDeprecation" :data="data" />
+            <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
+            <ReadMore v-if="data.description" :key="isLoggedIn" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
             <Description :description="data.description" />
-          </ReadMore>
+            </ReadMore>
+          </template>
           <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" class="mb-3" />
           <CollectionLink v-if="collectionLink" :link="collectionLink" />
           <section v-if="isCollection" class="metadata mb-4">
@@ -68,6 +71,7 @@ import Items from '../components/Items.vue';
 import ReadMore from "../components/ReadMore.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
+import TokenPrompt from '../components/TokenPrompt.vue';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
 import { hasText, isObject } from 'stac-js/src/utils.js';
@@ -95,6 +99,7 @@ export default defineComponent({
     MetadataGroups: defineAsyncComponent(() => import('../components/MetadataGroups.vue')),
     Providers: defineAsyncComponent(() => import('../components/Providers.vue')),
     ReadMore,
+    TokenPrompt,
     Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue'))
   },
   mixins: [
@@ -144,6 +149,7 @@ export default defineComponent({
   computed: {
     ...mapState(['data', 'url', 'apiCatalogPriority',  'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapGetters('auth', ['isLoggedIn']),
     cssStacType() {
       if (hasText(this.data?.type)) {
         return this.data?.type.toLowerCase();
