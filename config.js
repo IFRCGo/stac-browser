@@ -1,5 +1,5 @@
 module.exports = {
-    catalogUrl: "https://montandon-eoapi-stage.ifrc.org/stac",
+    catalogUrl: "https://montandon-eoapi.ifrc.org/stac",
     catalogTitle: "Montandon STAC API",
     catalogImage: null,
     allowExternalAccess: true, // Must be true if catalogUrl is not given
